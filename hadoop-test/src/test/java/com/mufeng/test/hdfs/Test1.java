@@ -1,16 +1,15 @@
-package com.mufeng.test;
+package com.mufeng.test.hdfs;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.hadoop.fs.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -58,7 +57,7 @@ public class Test1 {
     @Test
     public void testUpload() throws Exception{
         // 上传一个文件到HDFS中
-        fs.copyFromLocalFile(new Path("D:\\transferStation\\tmp\\12.txt"), new Path("/aaa/"));
+        fs.copyFromLocalFile(new Path("D:\\transferStation\\tmp\\123.txt"), new Path("/aaa/"));
 
         fs.close();
     }
@@ -143,5 +142,82 @@ public class Test1 {
             System.out.println("--------------------------------");
         }
         fs.close();
+    }
+    /**
+     * 读取hdfs中的文件的内容
+     *
+     * @throws IOException
+     * @throws IllegalArgumentException
+     */
+    @Test
+    public void testReadData() throws IllegalArgumentException, IOException {
+
+        FSDataInputStream in = fs.open(new Path("/aaa/12.txt"));
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, "utf-8"));
+
+        String line = null;
+        while ((line = br.readLine()) != null) {
+            System.out.println(line);
+        }
+
+        br.close();
+        in.close();
+        fs.close();
+
+    }
+    /**
+     * 读取hdfs中文件的指定偏移量范围的内容
+     *
+     *
+     * 作业题：用本例中的知识，实现读取一个文本文件中的指定BLOCK块中的所有数据
+     *
+     * @throws IOException
+     * @throws IllegalArgumentException
+     */
+    @Test
+    public void testRandomReadData() throws IllegalArgumentException, IOException {
+
+        FSDataInputStream in = fs.open(new Path("/aaa/12.txt"));
+
+        // 将读取的起始位置进行指定
+        in.seek(12);
+
+        // 读16个字节
+        byte[] buf = new byte[16];
+        in.read(buf);
+
+        System.out.println(new String(buf));
+
+        in.close();
+        fs.close();
+
+    }
+    /**
+     * 往hdfs中的文件写内容
+     *
+     * @throws IOException
+     * @throws IllegalArgumentException
+     */
+
+    @Test
+    public void testWriteData() throws IllegalArgumentException, IOException {
+
+        FSDataOutputStream out = fs.create(new Path("/zz.jpg"), false);
+
+        // D:\images\006l0mbogy1fhehjb6ikoj30ku0ku76b.jpg
+
+        FileInputStream in = new FileInputStream("D:/images/006l0mbogy1fhehjb6ikoj30ku0ku76b.jpg");
+
+        byte[] buf = new byte[1024];
+        int read = 0;
+        while ((read = in.read(buf)) != -1) {
+            out.write(buf,0,read);
+        }
+
+        in.close();
+        out.close();
+        fs.close();
+
     }
 }
