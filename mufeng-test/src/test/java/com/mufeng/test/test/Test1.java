@@ -55,4 +55,18 @@ public class Test1 {
         System.out.println(s);
         System.out.println(sb);
     }
+    @Test
+    public void test6(){
+        System.out.println(f(0));
+        System.out.println(f(1));
+        System.out.println(f(2));
+
+    }
+    public static  int f(int x){
+        if(x==0){
+            return 0; //基准情形
+        }else {
+            return 2*f(x-1)+x*x;
+        }
+    }
 }
